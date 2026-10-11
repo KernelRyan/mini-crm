@@ -9,16 +9,39 @@ import SyncContactsButton from "./SyncContactsButton";
 
 export default function DashboardPage() {
   return (
-    <main className="flex-1 bg-zinc-50 px-4 py-10">
-      <div className="mx-auto w-full max-w-3xl">
-        {/* Supabase auth reads cookies, which Cache Components requires behind a Suspense boundary. */}
-        <Suspense
-          fallback={<p className="text-sm text-zinc-500">Loading dashboard…</p>}
-        >
-          <Dashboard />
-        </Suspense>
+    <div className="flex flex-1 flex-col">
+      {/* Supabase auth reads cookies, which Cache Components requires behind a Suspense boundary. */}
+      <Suspense
+        fallback={
+          <>
+            <NavBar />
+            <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">
+              <p className="text-sm text-zinc-500">Loading dashboard…</p>
+            </main>
+          </>
+        }
+      >
+        <Dashboard />
+      </Suspense>
+    </div>
+  );
+}
+
+function NavBar({ children }: { children?: React.ReactNode }) {
+  return (
+    <nav className="sticky top-0 z-10 border-b border-zinc-200 bg-white/90 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div className="flex items-center gap-2.5">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-linear-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-sm">
+            M
+          </div>
+          <span className="text-base font-bold tracking-tight text-zinc-950">
+            Mini-CRM
+          </span>
+        </div>
+        {children}
       </div>
-    </main>
+    </nav>
   );
 }
 
@@ -41,32 +64,42 @@ async function Dashboard() {
 
   return (
     <>
-      <header className="flex items-start justify-between gap-4 border-b border-zinc-200 pb-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-950">
-            Contacts
-          </h1>
-          <p className="mt-1 text-sm text-zinc-500">{user.email}</p>
-        </div>
-        <div className="flex items-start gap-2">
-          <SyncContactsButton />
+      <NavBar>
+        <div className="flex items-center gap-4">
+          <span className="hidden truncate text-sm text-zinc-500 sm:block">
+            {user.email}
+          </span>
           <SignOutButton />
         </div>
-      </header>
+      </NavBar>
 
-      <section className="mt-8">
-        <AddContactForm />
-      </section>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">
+        <header className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-950">
+              Contacts
+            </h1>
+            <p className="mt-1 text-sm text-zinc-500">
+              {contacts.length} {contacts.length === 1 ? "contact" : "contacts"}
+            </p>
+          </div>
+          <SyncContactsButton />
+        </header>
 
-      <section className="mt-8">
-        {error ? (
-          <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-            Could not load contacts: {error.message}
-          </p>
-        ) : (
-          <ContactList contacts={contacts} />
-        )}
-      </section>
+        <section className="mt-8">
+          <AddContactForm />
+        </section>
+
+        <section className="mt-8">
+          {error ? (
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+              Could not load contacts: {error.message}
+            </p>
+          ) : (
+            <ContactList contacts={contacts} />
+          )}
+        </section>
+      </main>
     </>
   );
 }

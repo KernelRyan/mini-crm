@@ -34,17 +34,20 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-full items-center justify-center bg-zinc-50 px-4 py-16">
-      <div className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
-        <h1 className="text-center text-2xl font-semibold tracking-tight text-zinc-950">
+    <main className="flex flex-1 items-center justify-center bg-linear-to-br from-zinc-100 to-zinc-200 px-4 py-16">
+      <div className="w-full max-w-sm rounded-2xl border border-zinc-200/80 bg-white p-8 shadow-lg shadow-zinc-900/5 sm:p-10">
+        <div className="mx-auto flex size-10 items-center justify-center rounded-xl bg-linear-to-br from-blue-600 to-indigo-600 text-base font-bold text-white shadow-sm">
+          M
+        </div>
+        <h1 className="mt-6 text-center text-2xl font-semibold tracking-tight text-zinc-950">
           Log in
         </h1>
         <p className="mt-2 text-center text-sm text-zinc-500">
           Sign in to your Mini-CRM account
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-700">
+        <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
+          <label className="flex flex-col gap-2 text-sm font-medium text-zinc-700">
             Email
             <input
               type="email"
@@ -53,11 +56,11 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-normal text-zinc-950 outline-none ring-zinc-950/10 placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-2"
+              className="rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm font-normal text-zinc-950 shadow-xs outline-none transition placeholder:text-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
             />
           </label>
 
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-700">
+          <label className="flex flex-col gap-2 text-sm font-medium text-zinc-700">
             Password
             <input
               type="password"
@@ -66,12 +69,12 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-normal text-zinc-950 outline-none ring-zinc-950/10 placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-2"
+              className="rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm font-normal text-zinc-950 shadow-xs outline-none transition placeholder:text-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
             />
           </label>
 
           {error ? (
-            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
               {error}
             </p>
           ) : null}
@@ -79,17 +82,17 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-md bg-zinc-950 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-1 rounded-lg bg-linear-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-zinc-500">
+        <p className="mt-8 text-center text-sm text-zinc-500">
           Need an account?{" "}
           <Link
             href="/signup"
-            className="font-medium text-zinc-950 underline-offset-4 hover:underline"
+            className="font-medium text-blue-600 transition-colors hover:text-blue-700"
           >
             Sign up
           </Link>

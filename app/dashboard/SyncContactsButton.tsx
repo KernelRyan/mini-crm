@@ -50,7 +50,7 @@ export default function SyncContactsButton() {
         type="button"
         onClick={handleSync}
         disabled={loading}
-        className="rounded-md bg-zinc-950 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-sm font-medium text-zinc-700 shadow-xs transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Syncing..." : "Sync from API"}
       </button>
