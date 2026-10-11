@@ -1,5 +1,7 @@
 # Mini-CRM
 
+**🔗 Live demo:** https://mini-crm-amber-ten.vercel.app
+
 A small but complete CRM built with Next.js 16 and Supabase. Users can sign up, log in, and manage their own private list of contacts.
 
 ## Features
