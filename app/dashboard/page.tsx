@@ -5,6 +5,7 @@ import type { Contact } from "./actions";
 import AddContactForm from "./AddContactForm";
 import ContactList from "./ContactList";
 import SignOutButton from "./SignOutButton";
+import SyncContactsButton from "./SyncContactsButton";
 
 export default function DashboardPage() {
   return (
@@ -40,14 +41,17 @@ async function Dashboard() {
 
   return (
     <>
-      <header className="flex items-center justify-between gap-4 border-b border-zinc-200 pb-6">
+      <header className="flex items-start justify-between gap-4 border-b border-zinc-200 pb-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-950">
             Contacts
           </h1>
           <p className="mt-1 text-sm text-zinc-500">{user.email}</p>
         </div>
-        <SignOutButton />
+        <div className="flex items-start gap-2">
+          <SyncContactsButton />
+          <SignOutButton />
+        </div>
       </header>
 
       <section className="mt-8">
