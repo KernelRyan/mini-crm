@@ -1,26 +1,25 @@
 import { createClient } from "@/lib/supabase/server";
-import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
+import type { NextRequest } from "next/server";
 
-function safeNextPath(next: string | null) {
-  if (next && next.startsWith("/") && !next.startsWith("//")) {
-    return next;
+export async function GET(request: NextRequest) {
+  const code = request.nextUrl.searchParams.get("code");
+
+  if (!code) {
+    redirect("/login?error=missing_code");
   }
-  return "/dashboard";
-}
 
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get("code");
-  const next = safeNextPath(searchParams.get("next"));
-
-  if (code) {
+  let confirmed = false;
+  try {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
-    }
+    confirmed = !error;
+  } catch {
+    confirmed = false;
   }
 
-  return NextResponse.redirect(`${origin}/login`);
+  // redirect() throws to signal the redirect, so it must stay outside the try/catch above.
+  redirect(
+    confirmed ? "/login?confirmed=true" : "/login?error=confirmation_failed",
+  );
 }

@@ -2,8 +2,37 @@
 
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+
+function ConfirmationBanner() {
+  const searchParams = useSearchParams();
+
+  if (searchParams.has("error")) {
+    return (
+      <p
+        role="alert"
+        className="mt-6 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700"
+      >
+        Something went wrong confirming your email. Try signing in, or sign up
+        again.
+      </p>
+    );
+  }
+
+  if (searchParams.get("confirmed") === "true") {
+    return (
+      <p
+        role="status"
+        className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-sm text-emerald-800"
+      >
+        Email confirmed! You can now sign in.
+      </p>
+    );
+  }
+
+  return null;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,6 +74,11 @@ export default function LoginPage() {
         <p className="mt-2 text-center text-sm text-zinc-500">
           Sign in to your Mini-CRM account
         </p>
+
+        {/* useSearchParams needs a Suspense boundary so the rest of the page can still prerender. */}
+        <Suspense fallback={null}>
+          <ConfirmationBanner />
+        </Suspense>
 
         <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
           <label className="flex flex-col gap-2 text-sm font-medium text-zinc-700">
