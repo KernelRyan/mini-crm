@@ -4,6 +4,11 @@ import { useRef, useState, useTransition } from "react";
 import { deleteContact, type Contact } from "./actions";
 import EditContactForm from "./EditContactForm";
 
+const PAGE_SIZE = 10;
+
+const paginationButtonClassName =
+  "rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-sm font-medium text-zinc-700 shadow-xs transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white";
+
 function matchesQuery(contact: Contact, query: string) {
   return [contact.name, contact.email, contact.company].some((field) =>
     field?.toLowerCase().includes(query),
@@ -15,11 +20,17 @@ export default function ContactList({ contacts }: { contacts: Contact[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
   const [isPending, startTransition] = useTransition();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  function updateQuery(value: string) {
+    setQuery(value);
+    setPage(1);
+  }
+
   function clearSearch() {
-    setQuery("");
+    updateQuery("");
     searchInputRef.current?.focus();
   }
 
@@ -52,6 +63,14 @@ export default function ContactList({ contacts }: { contacts: Contact[] }) {
       )
     : contacts;
 
+  const totalPages = Math.max(1, Math.ceil(visibleContacts.length / PAGE_SIZE));
+  // Clamped so deleting the last contact on the last page doesn't strand the user on an empty page.
+  const currentPage = Math.min(page, totalPages);
+  const pageContacts = visibleContacts.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
   return (
     <div>
       <div className="relative mb-4">
@@ -71,9 +90,9 @@ export default function ContactList({ contacts }: { contacts: Contact[] }) {
           ref={searchInputRef}
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => updateQuery(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Escape") setQuery("");
+            if (e.key === "Escape") updateQuery("");
           }}
           placeholder="Search by name, email, or company"
           aria-label="Search contacts"
@@ -111,7 +130,7 @@ export default function ContactList({ contacts }: { contacts: Contact[] }) {
       ) : null}
 
       <ul className="flex flex-col gap-3">
-        {visibleContacts.map((contact) =>
+        {pageContacts.map((contact) =>
           editingId === contact.id ? (
             <li key={contact.id}>
               <EditContactForm
@@ -168,6 +187,34 @@ export default function ContactList({ contacts }: { contacts: Contact[] }) {
           ),
         )}
       </ul>
+
+      {totalPages > 1 ? (
+        <nav
+          aria-label="Contacts pagination"
+          className="mt-6 flex items-center justify-between gap-4"
+        >
+          <button
+            type="button"
+            onClick={() => setPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={paginationButtonClassName}
+          >
+            Previous
+          </button>
+          <p className="text-sm text-zinc-500" aria-live="polite">
+            Page <span className="font-medium text-zinc-950">{currentPage}</span>{" "}
+            of <span className="font-medium text-zinc-950">{totalPages}</span>
+          </p>
+          <button
+            type="button"
+            onClick={() => setPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={paginationButtonClassName}
+          >
+            Next
+          </button>
+        </nav>
+      ) : null}
     </div>
   );
 }
