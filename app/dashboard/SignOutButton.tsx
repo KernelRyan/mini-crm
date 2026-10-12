@@ -1,23 +1,23 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { Loader2, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function SignOutButton() {
   const router = useRouter();
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function handleSignOut() {
     setPending(true);
-    setError(null);
 
     const supabase = createClient();
     const { error: signOutError } = await supabase.auth.signOut();
 
     if (signOutError) {
-      setError(signOutError.message);
+      toast.error(signOutError.message);
       setPending(false);
       return;
     }
@@ -27,16 +27,18 @@ export default function SignOutButton() {
   }
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      <button
-        type="button"
-        onClick={handleSignOut}
-        disabled={pending}
-        className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {pending ? "Signing out…" : "Sign out"}
-      </button>
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
-    </div>
+    <button
+      type="button"
+      onClick={handleSignOut}
+      disabled={pending}
+      className="-mx-2 flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-zinc-400 transition-colors duration-150 hover:bg-white/5 hover:text-white active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      {pending ? (
+        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+      ) : (
+        <LogOut className="size-4" aria-hidden="true" />
+      )}
+      {pending ? "Signing out…" : "Sign out"}
+    </button>
   );
 }

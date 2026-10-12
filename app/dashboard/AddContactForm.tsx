@@ -1,7 +1,9 @@
 "use client";
 
+import { Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
+import { toast } from "sonner";
 import { addContact } from "./actions";
 
 type Draft = {
@@ -24,9 +26,9 @@ function readDraft(formData: FormData): Draft {
 }
 
 const inputClassName =
-  "rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm font-normal text-zinc-950 shadow-xs outline-none transition placeholder:text-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30";
+  "rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-normal text-zinc-950 outline-none transition-colors duration-150 placeholder:text-zinc-400 hover:border-zinc-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20";
 
-const labelClassName = "flex flex-col gap-2 text-sm font-medium text-zinc-700";
+const labelClassName = "flex flex-col gap-1.5 text-sm font-medium text-zinc-700";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -35,26 +37,30 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-lg bg-linear-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+      className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-indigo-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
     >
+      {pending ? (
+        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+      ) : (
+        <Plus className="size-4" aria-hidden="true" />
+      )}
       {pending ? "Adding…" : "Add contact"}
     </button>
   );
 }
 
 export default function AddContactForm() {
-  const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [formKey, setFormKey] = useState(0);
 
   async function handleAction(formData: FormData) {
-    setError(null);
     const result = await addContact(formData);
 
     if ("error" in result) {
-      setError(result.error);
+      toast.error(result.error);
       setDraft(readDraft(formData));
     } else {
+      toast.success("Contact added");
       setDraft(EMPTY_DRAFT);
     }
 
@@ -67,19 +73,22 @@ export default function AddContactForm() {
     <form
       key={formKey}
       action={handleAction}
-      className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8"
+      className="rounded-xl border border-zinc-200 bg-white shadow-sm"
     >
-      <h2 className="text-base font-semibold text-zinc-950">Add a contact</h2>
-      <p className="mt-1 text-sm text-zinc-500">
-        Only the name is required.
-      </p>
+      <div className="border-b border-zinc-100 px-6 py-4">
+        <h2 className="text-sm font-medium text-zinc-950">Add a contact</h2>
+        <p className="mt-0.5 text-sm text-zinc-500">
+          Only the name is required.
+        </p>
+      </div>
 
-      <div className="mt-6 grid gap-x-5 gap-y-5 sm:grid-cols-2">
+      <div className="grid gap-4 px-6 py-5 sm:grid-cols-2">
         <label className={labelClassName}>
           Name
           <input
             name="name"
             required
+            placeholder="Ada Lovelace"
             defaultValue={draft.name}
             className={inputClassName}
           />
@@ -89,6 +98,7 @@ export default function AddContactForm() {
           <input
             type="email"
             name="email"
+            placeholder="ada@example.com"
             defaultValue={draft.email}
             className={inputClassName}
           />
@@ -98,6 +108,7 @@ export default function AddContactForm() {
           <input
             type="tel"
             name="phone"
+            placeholder="+1 555 0100"
             defaultValue={draft.phone}
             className={inputClassName}
           />
@@ -106,19 +117,14 @@ export default function AddContactForm() {
           Company
           <input
             name="company"
+            placeholder="Analytical Engines Ltd."
             defaultValue={draft.company}
             className={inputClassName}
           />
         </label>
       </div>
 
-      {error ? (
-        <p className="mt-5 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
-          {error}
-        </p>
-      ) : null}
-
-      <div className="mt-6 flex justify-end border-t border-zinc-100 pt-6">
+      <div className="flex justify-end rounded-b-xl border-t border-zinc-100 bg-zinc-50/60 px-6 py-3">
         <SubmitButton />
       </div>
     </form>
