@@ -2,10 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { deleteContact, type Contact } from "./actions";
+import EditContactForm from "./EditContactForm";
 
 export default function ContactList({ contacts }: { contacts: Contact[] }) {
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleDelete(id: string) {
@@ -37,43 +39,62 @@ export default function ContactList({ contacts }: { contacts: Contact[] }) {
       ) : null}
 
       <ul className="flex flex-col gap-3">
-        {contacts.map((contact) => (
-          <li
-            key={contact.id}
-            className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white px-5 py-4 transition hover:border-zinc-300 hover:shadow-sm"
-          >
-            <div className="flex min-w-0 items-center gap-4">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-blue-50 to-indigo-100 text-sm font-semibold text-indigo-700">
-                {contact.name.trim().charAt(0).toUpperCase()}
-              </div>
-              <div className="min-w-0">
-                <div className="flex min-w-0 items-center gap-2">
-                  <p className="truncate font-semibold text-zinc-950">
-                    {contact.name}
-                  </p>
-                  {contact.company ? (
-                    <span className="shrink-0 rounded-md bg-zinc-100 px-1.5 py-0.5 text-xs font-medium text-zinc-600">
-                      {contact.company}
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mt-0.5 truncate text-sm text-zinc-500">
-                  {[contact.email, contact.phone]
-                    .filter(Boolean)
-                    .join(" · ") || "No contact details"}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => handleDelete(contact.id)}
-              disabled={isPending}
-              className="shrink-0 rounded-md px-2 py-1 text-sm font-medium text-red-600 transition-colors hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+        {contacts.map((contact) =>
+          editingId === contact.id ? (
+            <li key={contact.id}>
+              <EditContactForm
+                contact={contact}
+                onCancel={() => setEditingId(null)}
+              />
+            </li>
+          ) : (
+            <li
+              key={contact.id}
+              className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white px-5 py-4 transition hover:border-zinc-300 hover:shadow-sm"
             >
-              {deletingId === contact.id ? "Deleting…" : "Delete"}
-            </button>
-          </li>
-        ))}
+              <div className="flex min-w-0 items-center gap-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-blue-50 to-indigo-100 text-sm font-semibold text-indigo-700">
+                  {contact.name.trim().charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <p className="truncate font-semibold text-zinc-950">
+                      {contact.name}
+                    </p>
+                    {contact.company ? (
+                      <span className="shrink-0 rounded-md bg-zinc-100 px-1.5 py-0.5 text-xs font-medium text-zinc-600">
+                        {contact.company}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-0.5 truncate text-sm text-zinc-500">
+                    {[contact.email, contact.phone]
+                      .filter(Boolean)
+                      .join(" · ") || "No contact details"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setEditingId(contact.id)}
+                  disabled={isPending}
+                  className="rounded-md px-2 py-1 text-sm font-medium text-zinc-500 transition-colors hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(contact.id)}
+                  disabled={isPending}
+                  className="rounded-md px-2 py-1 text-sm font-medium text-red-600 transition-colors hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {deletingId === contact.id ? "Deleting…" : "Delete"}
+                </button>
+              </div>
+            </li>
+          ),
+        )}
       </ul>
     </div>
   );

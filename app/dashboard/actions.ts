@@ -80,3 +80,49 @@ export async function deleteContact(id: string): Promise<ActionResult> {
   revalidatePath("/dashboard");
   return { success: true };
 }
+
+export async function updateContact(
+  id: string,
+  formData: FormData,
+): Promise<ActionResult> {
+  if (typeof id !== "string" || id === "") {
+    return { error: "Invalid contact id." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be signed in to edit contacts." };
+  }
+
+  const name = optionalField(formData, "name");
+  if (!name) {
+    return { error: "Name is required." };
+  }
+
+  const { data, error } = await supabase
+    .from("contacts")
+    .update({
+      name,
+      email: optionalField(formData, "email"),
+      phone: optionalField(formData, "phone"),
+      company: optionalField(formData, "company"),
+    })
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .select("id");
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  if (data.length === 0) {
+    return { error: "Contact not found." };
+  }
+
+  revalidatePath("/dashboard");
+  return { success: true };
+}
