@@ -8,6 +8,17 @@ import { Suspense, useState } from "react";
 function ConfirmationBanner() {
   const searchParams = useSearchParams();
 
+  if (searchParams.get("reset") === "true") {
+    return (
+      <p
+        role="status"
+        className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-sm text-emerald-800"
+      >
+        Password updated. Please sign in with your new password.
+      </p>
+    );
+  }
+
   if (searchParams.has("error")) {
     return (
       <p
@@ -121,6 +132,15 @@ export default function LoginPage() {
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        <div className="mt-3 flex justify-end">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-zinc-500 transition-colors hover:text-indigo-600"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
         <p className="mt-8 text-center text-sm text-zinc-500">
           Need an account?{" "}
